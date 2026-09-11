@@ -1,9 +1,9 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.urls import reverse
-
+from auctions.models import *
 from .models import User
 
 
@@ -61,3 +61,17 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+
+def add(request):
+    if request.method == "POST":
+        name = request.POST["name"]
+        price = request.POST["price"]
+        if request.POST["img"] is not None:
+            img = request.POST["img"]
+        else :
+            img = request.POST["img"]  # create a default image
+              
+        Listings.objects.create(name=name,price=price,image=img)
+        return redirect('index')
+    return render(request,'auctions/Add_listing.html')
