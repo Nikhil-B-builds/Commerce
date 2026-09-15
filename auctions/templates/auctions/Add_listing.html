@@ -1,27 +1,20 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
- 
-
+    {% if warning%}
+    <div class="alert alert-warning" role="alert">
+        {{warning}}
+    </div>
+    {%endif%}
+    
     <form action="{% url 'add' %}" method="post">
         {% csrf_token %}
+        {% for item in form %}
         <div class="mb-3">
-            <label for="Name" class="form-label">Listing Name</label>
-            <input type="text" class="form-control" id="Name" aria-describedby="emailHelp" name="name"  placeholder="object name">
-            
+            <label for="Name" class="form-label">{{item.label}}</label>
+            {{item}}
         </div>
-        <div class="mb-3">
-            <label for="price" class="form-label">Price</label>
-            <input type="number" class="form-control" id="price" name="price" placeholder="In Inr">
-        </div>
-        <div class="mb-3">
-            <label for="img" class="form-label">Image (optional)</label>
-            <input type="url" class="form-control" id="img" name="img" placeholder="enter a valid url" >
-        </div>
-  <!-- <div class="mb-3 form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-  </div> -->
+        {% endfor %}
         <input class="btn btn-primary" type="submit" value="Add">
     </form>
 

@@ -7,9 +7,31 @@ body {
 .main {
     margin : 10px;
     #Active_Listings {
-        margin-bottom: 20px;
+        margin-bottom: 30px;
     
     }
+    .Listings {
+        border: 2px solid black;
+        margin-bottom: 40px;
+        table{
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 0%;
+            
+        }
+        th:nth-child(2){
+          width: 60%;
+          margin-top: 0%;
+          
+        }
+        .image{
+        margin: 10px;
+        width: 80%;
+        object-fit: contain;
+        margin-bottom: 0%;
+        }
+    }
+    
   }
 
 }

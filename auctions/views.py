@@ -5,10 +5,70 @@ from django.shortcuts import render,redirect
 from django.urls import reverse
 from auctions.models import *
 from .models import User
+from django import forms
+import requests
+
+
+class Createlisting(forms.Form):
+    name = forms.CharField(
+        label='Item name',
+        widget=forms.TextInput(
+            attrs={
+            "class":"form-control",
+            "id":"Name" ,
+            "name":"name" ,
+            "placeholder":"item name",
+            }
+        )
+    )
+
+    price = forms.CharField(
+        label='Price',
+        widget=forms.NumberInput(
+            attrs={
+            "class":"form-control",
+            "id":"price" ,
+            "name":"Price" ,
+            "placeholder": "Price starts from ..",
+            }
+        )
+    )
+    image = forms.URLField(
+        label='Image url (optional)',
+        required=False,
+        widget=forms.URLInput(
+            attrs={
+            "class":"form-control",
+            "id":"image" ,
+            "name":"image" ,
+            "placeholder": "Plz enter a valid url",
+            }
+        )
+    )
+
+    def clean_image(self):
+        image_url = self.cleaned_data["image"]
+        temp_url = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQloBQfR1oxndVS2Z3qfCtzcpFea_-55X9idaGUSIpAQ&s=10"
+        if not image_url:
+            return temp_url
+
+        try:
+            response = requests.get(image_url,timeout=2)
+
+            content = response.headers.get("content-type","")
+            if not content.startswith("image/"):
+                raise forms.ValidationError("Must be a image")
+        except requests.RequestException:
+            return temp_url
+
+        return image_url
+
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    return render(request, "auctions/index.html",{
+        "listings":Listings.objects.all()
+    })
 
 
 def login_view(request):
@@ -65,13 +125,20 @@ def register(request):
 
 def add(request):
     if request.method == "POST":
-        name = request.POST["name"]
-        price = request.POST["price"]
-        if request.POST["img"] is not None:
-            img = request.POST["img"]
-        else :
-            img = request.POST["img"]  # create a default image
-              
-        Listings.objects.create(name=name,price=price,image=img)
-        return redirect('index')
-    return render(request,'auctions/Add_listing.html')
+        form = Createlisting(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data["name"]
+            price = form.cleaned_data["price"]
+            img = form.cleaned_data["image"]
+            Listings.objects.create(name=name,price=price,image=img)
+            return redirect('index')
+        
+        return render(request,'auctions/Add_listing.html',
+                      {
+                        'form':Createlisting(),
+                        'warning':"Invalid image url"
+                        }
+                    )
+    return render(request,'auctions/Add_listing.html',{
+        'form':Createlisting()
+    })
