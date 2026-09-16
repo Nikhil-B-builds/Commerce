@@ -7,7 +7,7 @@ from auctions.models import *
 from .models import User
 from django import forms
 import requests
-
+from django.contrib.auth.decorators import login_required
 
 class Createlisting(forms.Form):
     name = forms.CharField(
@@ -33,6 +33,23 @@ class Createlisting(forms.Form):
             }
         )
     )
+
+    description = forms.CharField(
+        label="Description",
+        max_length=50,
+        widget=forms.TextInput(
+            attrs={
+                "class":"form-control",
+                "id":"price" ,
+                "name":"Price" ,
+                "placeholder": "add a short description ..",
+            }
+        )
+
+    )
+
+
+
     image = forms.URLField(
         label='Image url (optional)',
         required=False,
@@ -63,7 +80,29 @@ class Createlisting(forms.Form):
 
         return image_url
 
+class BidForm(forms.Form):
+        # def __init__(self,*args,**kwargs):
+        #     super().__init__(*args,**kwargs)
 
+        #     self.fields['price'].label = "Current bid"
+        #     self.fields['price'].widget.attrs['placeholder'] = 'Enter your bid'
+        #     self.fields["price"].required = False
+
+        #     self.fields.pop('name')
+        #     self.fields.pop('description')
+        #     self.fields.pop('image')
+
+        bid = forms.CharField(
+                
+                widget=forms.NumberInput(
+                    attrs={
+                    "class":"form-control",
+                    "id":"bid" ,
+                    "name":"bid" ,
+                    "placeholder": "Enter your bid ...",
+                    }
+                )
+            )
 
 def index(request):
     return render(request, "auctions/index.html",{
@@ -130,13 +169,14 @@ def add(request):
             name = form.cleaned_data["name"]
             price = form.cleaned_data["price"]
             img = form.cleaned_data["image"]
-            Listings.objects.create(name=name,price=price,image=img)
+            description = form.cleaned_data['description']
+            Listings.objects.create(name=name,price=price,image=img,description=description)
             return redirect('index')
         
         return render(request,'auctions/Add_listing.html',
                       {
                         'form':Createlisting(),
-                        'warning':"Invalid image url"
+                        'warning':"Invalid image url" 
                         }
                     )
     return render(request,'auctions/Add_listing.html',{
@@ -148,7 +188,36 @@ def add(request):
 
 def entry(request,name,id):
     data = Listings.objects.get(id=id)
-
+    total_bids = (Bid.objects.filter(listing_id=id)).count()
+    # highest = Bid.objects.get(amount=max(Bid.objects.filter(listing_id=id)))
+    highest = 'who is the highest amoung all'
+    if request.method == 'POST':
+        form = BidForm(request.POST)
+        
+        if form.is_valid():
+            bid = form.cleaned_data['bid']
+            if int(bid)<= data.price:
+                return render(request,'auctions/entry.html',
+                                                  {
+                                                    'data':data,
+                                                    'Bid':total_bids,
+                                                    'form':BidForm,
+                                                    'name':name,
+                                                    'id':id,
+                                                    'highest':highest,
+                                                    'warning' :'Bid value should be higher than current price',
+                                                  })
+            Bid.objects.create(amount=bid,listing_id=id,user=request.user)
+            Listings.objects.filter(id=id).update(price=bid)
+            return redirect('entry',name=name,id=id)
+        else :
+            return redirect('entry',name=name,id=id)
+    
     return render(request,'auctions/entry.html',{
         'data':data,
+        'Bid':total_bids,
+        'form':BidForm,
+        'name':name,
+        'id':id,
+        'highest':highest
     })

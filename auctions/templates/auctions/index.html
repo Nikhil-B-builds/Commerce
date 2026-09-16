@@ -24,7 +24,7 @@
                     <h4 class="price">Price: ${{listing.price}}</h4>
                     <form action="{%url 'entry' listing.name listing.id %}" method="post">
                         {% csrf_token %}
-                        <input type="submit" class="btn btn-primary" value="Bid">
+                        <input type="submit" class="btn btn-primary" value="Know more">
                     </form>
                     <p class="date"> Created on : {{listing.created_on}}</p>
                 </div>
