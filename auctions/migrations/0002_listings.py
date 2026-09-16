@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Listings',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID',)),
                 ('created_on', models.DateTimeField(auto_created=True)),
                 ('name', models.CharField(max_length=60)),
                 ('price', models.IntegerField()),

@@ -142,3 +142,13 @@ def add(request):
     return render(request,'auctions/Add_listing.html',{
         'form':Createlisting()
     })
+
+
+
+
+def entry(request,name,id):
+    data = Listings.objects.get(id=id)
+
+    return render(request,'auctions/entry.html',{
+        'data':data,
+    })

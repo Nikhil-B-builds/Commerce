@@ -11,25 +11,39 @@ body {
     
     }
     .Listings {
-        border: 2px solid black;
+        border: 1px solid black;
         margin-bottom: 40px;
+        width: 100%;
+        vertical-align: top;
         table{
+            table-layout: fixed;
             border-collapse: collapse;
             width: 100%;
-            margin-bottom: 0%;
-            
+           
         }
-        th:nth-child(2){
-          width: 60%;
-          margin-top: 0%;
-          
+
+        
+        td:nth-child(2){
+            width: 60%;
+            padding-bottom: 3%;
+            .price{
+                padding-top: 3%;
+                padding-bottom: 3%;
+            }
+            .date{
+               padding-top: 3%;
+            }
         }
+        td:nth-child(1){
+        width: 40%;
+        
         .image{
+        min-width: 30%;
         margin: 10px;
         width: 80%;
         object-fit: contain;
-        margin-bottom: 0%;
         }
+      } 
     }
     
   }
