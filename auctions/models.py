@@ -7,11 +7,12 @@ class User(AbstractUser):
 
 
 class Listings(models.Model):
-    name = models.CharField(max_length=60)
+    name = models.CharField(max_length=60,unique=True)
     price = models.IntegerField()
-    image = models.URLField(max_length=300,blank=True,null=True)
+    image = models.URLField(max_length=300,default='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQloBQfR1oxndVS2Z3qfCtzcpFea_-55X9idaGUSIpAQ&s=10')
     created_on = models.DateTimeField(auto_created=True,auto_now_add=True)
     description  = models.CharField(max_length=100)
+    Categories = models.CharField(max_length=60,blank=True)
 
     def __str__(self):
         return f'{self.name}{self.price}{self.image}{self.created_on}'
@@ -25,3 +26,12 @@ class Bid(models.Model):
     amount = models.IntegerField()
     def __str__(self):
         return f'{self.amount}'
+
+
+class Createdby(models.Model):
+     listing = models.ForeignKey(Listings,on_delete=models.CASCADE,related_name="created_by",unique=True)
+     name = models.CharField(default=User,max_length=60)
+
+     def __str__(self):
+         return f'{self.name}'
+

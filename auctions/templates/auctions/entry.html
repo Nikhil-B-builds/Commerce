@@ -25,11 +25,19 @@
             <h3>${{data.price}}</h3>
         </div>
         <div class="bid">
-            <h5>{{Bid}} Bids so far {{highest}}</h5>
+            <h5>{{Bid}} Bids so far
+                {% if not highest %}
+                   
+                {% elif user == highest.user %}
+                    ,You have the highest bid 
+                {% else %}
+                  ,{{highest.user}} have the highest bid
+                {% endif %}
+            </h5>
         </div>
 
         <div class="form">
-        <form action="{%url 'entry' name id %}" method="post">
+         <form action="{%url 'entry' name id %}" method="post">
             {%csrf_token%}
             <div class="mb-3">
                 <label for="Name" class="form-label">{{form.label}}</label>
@@ -37,7 +45,16 @@
             
                 <input class="btn btn-primary" type="submit" value="Place">
                 </div>
-            </form>
+         </form>
+        </div>
+
+        <div class="details">
+            <h4> Details</h4>
+            <ul>
+                <li> listed by: {{created_by.name}}</li>
+                <li> Category : </li>
+            </ul>
+
         </div>
     </div>
     

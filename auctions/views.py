@@ -63,6 +63,8 @@ class Createlisting(forms.Form):
         )
     )
 
+    
+
     def clean_image(self):
         image_url = self.cleaned_data["image"]
         temp_url = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQloBQfR1oxndVS2Z3qfCtzcpFea_-55X9idaGUSIpAQ&s=10"
@@ -70,15 +72,23 @@ class Createlisting(forms.Form):
             return temp_url
 
         try:
-            response = requests.get(image_url,timeout=2)
+            print("1"*10)
+            response = requests.get(image_url,timeout=3)
 
             content = response.headers.get("content-type","")
             if not content.startswith("image/"):
+                print("2"*10)
                 raise forms.ValidationError("Must be a image")
         except requests.RequestException:
             return temp_url
 
         return image_url
+
+
+    categorie = forms.ChoiceField(
+            label='Choose a categories(optional)',
+            choices=[('1','2'),('3','4')],
+        )
 
 class BidForm(forms.Form):
         # def __init__(self,*args,**kwargs):
@@ -166,17 +176,29 @@ def add(request):
     if request.method == "POST":
         form = Createlisting(request.POST)
         if form.is_valid():
+            
             name = form.cleaned_data["name"]
-            price = form.cleaned_data["price"]
-            img = form.cleaned_data["image"]
-            description = form.cleaned_data['description']
-            Listings.objects.create(name=name,price=price,image=img,description=description)
-            return redirect('index')
+            if not (Listings.objects.filter(name=name).exists()):
+                price = form.cleaned_data["price"]
+                img = form.cleaned_data["image"]
+                description = form.cleaned_data['description']
+                Listings.objects.create(name=name,price=price,image=img,description=description)
+                listing = Listings.objects.last()
+                Createdby.objects.create(name=request.user,listing_id=listing.id)
+                return redirect('index')
+            else :
+                return render(request,'auctions/Add_listing.html',
+                                      {
+                                        'form':Createlisting(),
+                                        'warning':'Listing with this name already exists'
+                                        }
+                                    )
+
         
         return render(request,'auctions/Add_listing.html',
                       {
                         'form':Createlisting(),
-                        'warning':"Invalid image url" 
+                        'warning':'invalid image url'
                         }
                     )
     return render(request,'auctions/Add_listing.html',{
@@ -188,9 +210,12 @@ def add(request):
 
 def entry(request,name,id):
     data = Listings.objects.get(id=id)
-    total_bids = (Bid.objects.filter(listing_id=id)).count()
-    # highest = Bid.objects.get(amount=max(Bid.objects.filter(listing_id=id)))
-    highest = 'who is the highest amoung all'
+    bid_data = Bid.objects.filter(listing_id=id) 
+    total_bids = bid_data.count() 
+    highest = bid_data.order_by("-amount").first()
+    
+    
+    # highest = 'who is the highest amoung all'
     if request.method == 'POST':
         form = BidForm(request.POST)
         
@@ -206,6 +231,7 @@ def entry(request,name,id):
                                                     'id':id,
                                                     'highest':highest,
                                                     'warning' :'Bid value should be higher than current price',
+                                                    'created_by':Createdby.objects.get(listing_id=id),
                                                   })
             Bid.objects.create(amount=bid,listing_id=id,user=request.user)
             Listings.objects.filter(id=id).update(price=bid)
@@ -219,5 +245,6 @@ def entry(request,name,id):
         'form':BidForm,
         'name':name,
         'id':id,
-        'highest':highest
+        'highest':highest,
+        'created_by':Createdby.objects.get(listing_id=id),
     })

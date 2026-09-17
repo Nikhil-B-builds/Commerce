@@ -10,7 +10,7 @@
     <form action="{% url 'add' %}" method="post">
         {% csrf_token %}
         {% for item in form %}
-        <div class="mb-3">
+        <div >
             <label for="Name" class="form-label">{{item.label}}</label>
             {{item}}
         </div>
