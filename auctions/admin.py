@@ -3,7 +3,7 @@ from auctions.models import *
 # Register your models here.
 
 class AdminListing(admin.ModelAdmin):
-    list_display = ("id","name","price","created_on","image",'Categories')
+    list_display = ("id","name","price","created_on","image","category")
     
 
 class Userlisting(admin.ModelAdmin):

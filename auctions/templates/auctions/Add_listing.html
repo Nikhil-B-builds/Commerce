@@ -1,6 +1,8 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+ 
+ {% if user.is_authenticated %}
     {% if warning%}
     <div class="alert alert-warning" role="alert">
         {{warning}}
@@ -10,7 +12,7 @@
     <form action="{% url 'add' %}" method="post">
         {% csrf_token %}
         {% for item in form %}
-        <div >
+        <div style="margin-bottom: 10px;" >
             <label for="Name" class="form-label">{{item.label}}</label>
             {{item}}
         </div>
@@ -18,5 +20,26 @@
         <input class="btn btn-primary" type="submit" value="Add">
     </form>
 
- <h5> Transfer all this in django forms and make url optional </h5>
+ {% else %}
+
+  <div> 
+        
+        <h3>Plz Login to access this page :
+         <a href="{% url 'login' %}" class="btn btn-primary">
+          Login
+         </a>   
+        </h3>
+       
+    </div>
+
+    <div>
+        <h3>Don't have an account register here :
+            <a href="{% url 'register' %}" class="btn btn-primary">
+            Register
+            </a>
+       </h3>
+    </div>
+
+ {% endif %}
+ 
 {% endblock %}

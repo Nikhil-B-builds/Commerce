@@ -72,12 +72,12 @@ class Createlisting(forms.Form):
             return temp_url
 
         try:
-            print("1"*10)
+            
             response = requests.get(image_url,timeout=3)
 
             content = response.headers.get("content-type","")
             if not content.startswith("image/"):
-                print("2"*10)
+                
                 raise forms.ValidationError("Must be a image")
         except requests.RequestException:
             return temp_url
@@ -85,10 +85,21 @@ class Createlisting(forms.Form):
         return image_url
 
 
-    categorie = forms.ChoiceField(
-            label='Choose a categories(optional)',
-            choices=[('1','2'),('3','4')],
-        )
+    category = forms.ChoiceField(
+    choices=[
+        ('None','NO category'),
+        ('electronics', 'Electronics'),
+        ('books', 'Books'),
+        ('fashion', 'Fashion'),
+        ('home', 'Home & Garden'),
+    ],
+    initial='None',
+    widget=forms.Select(attrs={
+        'class':"form-select",
+        
+    })
+
+)
 
 class BidForm(forms.Form):
         # def __init__(self,*args,**kwargs):
@@ -182,7 +193,8 @@ def add(request):
                 price = form.cleaned_data["price"]
                 img = form.cleaned_data["image"]
                 description = form.cleaned_data['description']
-                Listings.objects.create(name=name,price=price,image=img,description=description)
+                category = form.cleaned_data['category']
+                Listings.objects.create(name=name,price=price,image=img,description=description,category=category)
                 listing = Listings.objects.last()
                 Createdby.objects.create(name=request.user,listing_id=listing.id)
                 return redirect('index')
@@ -206,45 +218,49 @@ def add(request):
     })
 
 
+def ren(request,name,data,total_bids,highest,req,id):
+    warn=''
+    if req == 'Higher value':
+       warn = 'Bid value should be higher then current price'
+    elif req == 'not_login':
+       warn = 'You must first login to Bid'
+    else :
+     bid = False
 
+    return render(request,'auctions/entry.html',
+                                    {
+                                    'data':data,
+                                    'Bid':total_bids,
+                                    'form':BidForm,
+                                    'name':name,
+                                    'id':id,
+                                    'highest':highest,
+                                    'warning' :warn,
+                                    'created_by':Createdby.objects.get(listing_id=id),
+                                    'category':data.get_category_display(),
+                                })
 
 def entry(request,name,id):
     data = Listings.objects.get(id=id)
     bid_data = Bid.objects.filter(listing_id=id) 
     total_bids = bid_data.count() 
     highest = bid_data.order_by("-amount").first()
-    
-    
-    # highest = 'who is the highest amoung all'
     if request.method == 'POST':
-        form = BidForm(request.POST)
+
+        if request.user.is_authenticated :
+            form = BidForm(request.POST)
+            if form.is_valid():
+                bid = form.cleaned_data['bid']
+
+                if int(bid)<= data.price:
+                    return  ren(request,name,data,total_bids,highest,'Higher value',id)
+                
+                Bid.objects.create(amount=bid,listing_id=id,user=request.user)
+                Listings.objects.filter(id=id).update(price=bid)
+                return redirect('entry',name=name,id=id)
+            
+            return redirect('entry',name=name,id=id)
         
-        if form.is_valid():
-            bid = form.cleaned_data['bid']
-            if int(bid)<= data.price:
-                return render(request,'auctions/entry.html',
-                                                  {
-                                                    'data':data,
-                                                    'Bid':total_bids,
-                                                    'form':BidForm,
-                                                    'name':name,
-                                                    'id':id,
-                                                    'highest':highest,
-                                                    'warning' :'Bid value should be higher than current price',
-                                                    'created_by':Createdby.objects.get(listing_id=id),
-                                                  })
-            Bid.objects.create(amount=bid,listing_id=id,user=request.user)
-            Listings.objects.filter(id=id).update(price=bid)
-            return redirect('entry',name=name,id=id)
-        else :
-            return redirect('entry',name=name,id=id)
+        return ren(request,name,data,total_bids,highest,'not_login',id)
     
-    return render(request,'auctions/entry.html',{
-        'data':data,
-        'Bid':total_bids,
-        'form':BidForm,
-        'name':name,
-        'id':id,
-        'highest':highest,
-        'created_by':Createdby.objects.get(listing_id=id),
-    })
+    return ren(request,name,data,total_bids,highest,0,id)

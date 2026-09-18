@@ -2,7 +2,7 @@
 
 {% block body %}
 
- {% if user.is_authenticated %}
+
     {% if warning%}
     <div class="alert alert-warning" role="alert">
         {{warning}}
@@ -52,17 +52,19 @@
             <h4> Details</h4>
             <ul>
                 <li> listed by: {{created_by.name}}</li>
-                <li> Category : </li>
+                <li> Category : 
+                    {% if category == 'None' %}
+                      No categories listed 
+                    {% else %}
+                      {{category}}
+                    {% endif %}
+
+                </li>
             </ul>
 
         </div>
     </div>
     
- {% else %}
-
-    <h1> Plz login to access this page </h1>
-
- {% endif %}
 
 {% endblock %}
 
