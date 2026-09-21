@@ -20,8 +20,23 @@
             <td><img class='image' src="{{listing.image}}" alt=""></td>
             <td>
                 <div class="content">
-                    <h2><a href="{% url 'entry' listing.name listing.id%}">{{listing.name}}</a></h2>
-                    <h4 class="price">Price: ${{listing.price}}</h4>
+                    <h2><a href="{% url 'entry' listing.name listing.id%}">{{listing.name}}</a>
+                    {% if not listing.sold.status %}
+                        (Auction ended)
+                    {% endif %}
+                    </h2>
+
+
+
+
+                    <h4 class="price">
+                        {% if not listing.sold.status %}
+                         Sold at
+                        {% else %}
+                         Price
+                        {% endif %}
+                        
+                        : ${{listing.price}}</h4>
                     <form action="{%url 'entry' listing.name listing.id %}" method="post">
                         {% csrf_token %}
                         <input type="submit" class="btn btn-primary" value="Know more">

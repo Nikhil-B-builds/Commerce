@@ -13,8 +13,12 @@ class bidlisitng(admin.ModelAdmin):
     list_display =('id','amount','user_id','listing_id')
 
 class createdlisting(admin.ModelAdmin):
-    list_display = ('id','listing_id','name')
+    list_display = ('id','listing_id','name_id')
 
+class Soldadmin(admin.ModelAdmin):
+    list_display= ( 'id','sold_to_id','sold_at','listing_id','status')
+
+admin.site.register(Sold,Soldadmin)
 admin.site.register(Listings,AdminListing)
 admin.site.register(User,Userlisting)
 admin.site.register(Createdby,createdlisting)

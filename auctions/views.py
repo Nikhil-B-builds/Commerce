@@ -8,6 +8,7 @@ from .models import User
 from django import forms
 import requests
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 class Createlisting(forms.Form):
     name = forms.CharField(
@@ -126,8 +127,11 @@ class BidForm(forms.Form):
             )
 
 def index(request):
+   
+    
     return render(request, "auctions/index.html",{
-        "listings":Listings.objects.all()
+        "listings":Listings.objects.all(),
+        
     })
 
 
@@ -195,8 +199,12 @@ def add(request):
                 description = form.cleaned_data['description']
                 category = form.cleaned_data['category']
                 Listings.objects.create(name=name,price=price,image=img,description=description,category=category)
-                listing = Listings.objects.last()
-                Createdby.objects.create(name=request.user,listing_id=listing.id)
+                
+                listing = Listings.order_by("-id").first()
+                Createdby.objects.create(name_id=request.user,listing_id=listing.id)
+
+               
+                Sold.objects.create(listing_id=listing.id,)
                 return redirect('index')
             else :
                 return render(request,'auctions/Add_listing.html',
@@ -225,8 +233,9 @@ def ren(request,name,data,total_bids,highest,req,id):
     elif req == 'not_login':
        warn = 'You must first login to Bid'
     else :
-     bid = False
+       warn = False
 
+    price = True if total_bids  else False
     return render(request,'auctions/entry.html',
                                     {
                                     'data':data,
@@ -240,27 +249,34 @@ def ren(request,name,data,total_bids,highest,req,id):
                                     'category':data.get_category_display(),
                                 })
 
+
+def bid(request,name,data,total_bids,highest,id):
+    if request.user.is_authenticated :
+        print(request.user.is_authenticated)
+        form = BidForm(request.POST)
+        if form.is_valid():
+            bid = form.cleaned_data['bid']
+            if int(bid)<= data.price:
+                return  ren(request,name,data,total_bids,highest,'Higher value',id)
+                     
+            Bid.objects.create(amount=bid,listing_id=id,user=request.user)
+            Listings.objects.filter(id=id).update(price=bid)
+            return redirect('entry',name=name,id=id)
+                 
+        return redirect('entry',name=name,id=id)
+             
+    return ren(request,name,data,total_bids,highest,'not_login',id)
+
 def entry(request,name,id):
     data = Listings.objects.get(id=id)
-    bid_data = Bid.objects.filter(listing_id=id) 
+    bid_data = Bid.objects.filter(listing_id=id)
     total_bids = bid_data.count() 
     highest = bid_data.order_by("-amount").first()
     if request.method == 'POST':
-
-        if request.user.is_authenticated :
-            form = BidForm(request.POST)
-            if form.is_valid():
-                bid = form.cleaned_data['bid']
-
-                if int(bid)<= data.price:
-                    return  ren(request,name,data,total_bids,highest,'Higher value',id)
-                
-                Bid.objects.create(amount=bid,listing_id=id,user=request.user)
-                Listings.objects.filter(id=id).update(price=bid)
-                return redirect('entry',name=name,id=id)
-            
-            return redirect('entry',name=name,id=id)
-        
-        return ren(request,name,data,total_bids,highest,'not_login',id)
-    
+         return bid(request,name,data,total_bids,highest,id)
     return ren(request,name,data,total_bids,highest,0,id)
+
+@login_required
+def close(request,name,id):
+    Sold.objects.update(status=False)
+    return redirect('index')

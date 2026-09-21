@@ -10,7 +10,15 @@
     {%endif%}
     <div>
         <div class="entry-title">
-            <h2>Listing: {{data.name}}</h2>
+            <h2>Listing: {{data.name}} <br> impliment the logic of closing a bid </h2>
+
+            {% if  request.user.username == created_by.name.username %}
+               <form action="{% url 'close' name id %}" method="post"> 
+                {% csrf_token %}
+                  <input type="submit" value="Close bid" class="btn btn-primary">
+               </form>
+            {% endif %}
+               
         </div>
         
         <div class="entry-image">
@@ -21,8 +29,12 @@
             {{data.description}}
         </div>
         
-        <div> 
-            <h3>${{data.price}}</h3>
+        <div id="entry-price"> 
+            {% if Bid %}
+              <h3>Current bid : ${{data.price}}</h3>
+            {% else %}
+               <h3>Starting bid : ${{data.price}}</h3>
+            {% endif %}
         </div>
         <div class="bid">
             <h5>{{Bid}} Bids so far
@@ -51,7 +63,7 @@
         <div class="details">
             <h4> Details</h4>
             <ul>
-                <li> listed by: {{created_by.name}}</li>
+                <li> listed by : {{created_by}}</li>
                 <li> Category : 
                     {% if category == 'None' %}
                       No categories listed 

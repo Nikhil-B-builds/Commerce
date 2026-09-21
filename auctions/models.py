@@ -20,8 +20,9 @@ class Listings(models.Model):
         ('books', 'Books'),
         ('fashion', 'Fashion'),]
     )
+    
     def __str__(self):
-        return f'{self.name}{self.price}{self.image}{self.created_on}'
+        return f'{self.name}'
 
 
 
@@ -35,9 +36,18 @@ class Bid(models.Model):
 
 
 class Createdby(models.Model):
-     listing = models.ForeignKey(Listings,on_delete=models.CASCADE,related_name="created_by",unique=True)
-     name = models.CharField(default=User,max_length=60)
+     listing = models.OneToOneField(Listings,on_delete=models.CASCADE,related_name="created_by",unique=True)
+     name = models.ForeignKey(User,on_delete=models.CASCADE,related_name='created')
 
      def __str__(self):
          return f'{self.name}'
 
+
+class Sold(models.Model):
+    listing = models.OneToOneField(Listings,on_delete=models.CASCADE,related_name='sold')
+    status =  models.BooleanField(default=True)
+    sold_at = models.DateTimeField(auto_now=True)
+    sold_to = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True )
+
+    def __str__(self):
+        return f'{self.sold_to}'
