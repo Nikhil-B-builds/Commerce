@@ -126,6 +126,18 @@ class BidForm(forms.Form):
                 )
             )
 
+
+class Commentform(forms.Form):
+    comment = forms.CharField(
+        label='Add a Comment',
+        max_length=100,
+        widget=forms.TextInput(attrs={
+        'class':'form-control',
+        'id':'comment_text',
+        'placeholder':'Type here ...'
+        })
+    )
+
 def index(request):
    
     
@@ -200,8 +212,8 @@ def add(request):
                 category = form.cleaned_data['category']
                 Listing.objects.create(name=name,price=price,image=img,description=description,category=category,highest_bidder=request.user)
                 
-                listing = Listing.order_by("-id").first()
-                Createdby.objects.create(name_id=request.user,listing_id=listing.id)
+                listing = Listing.objects.order_by("-id").first()
+                Createdby.objects.create(name=request.user,listing_id=listing.id)
 
                
                 Sold.objects.create(listing_id=listing.id,)
@@ -239,14 +251,16 @@ def ren(request,name,data,total_bids,highest,req,id):
                                     {
                                     'data':data,
                                     'Bid':total_bids,
-                                    'form':BidForm,
+                                    'bidform':BidForm,
                                     'name':name,
                                     'id':id,
                                     'highest':highest,
                                     'warning' :warn,
                                     'created_by':Createdby.objects.get(listing_id=id),
                                     'category':data.get_category_display(),
-                                    'listing':Listing
+                                    'listing':Listing,
+                                    'comments':Comment.objects.filter(listing_id=id),
+                                    'comform':Commentform,
                                 })
 
 
@@ -278,8 +292,20 @@ def entry(request,name,id):
 
 @login_required
 def close(request,name,id):
-    data = Sold.objects.get(listing_id=id)
-    data.status = False
-    data.sold_to = Listing.objects.get(id=id).highest_bidder
-    data.save()
-    return redirect('index')
+    if request.method == 'POST':
+        data = Sold.objects.get(listing_id=id)
+        data.status = False
+        data.sold_to = Listing.objects.get(id=id).highest_bidder
+        data.save()
+        return redirect('index')
+    return redirect('entry',name=name,id=id)
+
+def comment(request,name,id):
+    if request.method == 'POST':
+        form = Commentform(request.POST)
+        if form.is_valid():
+           comment = form.cleaned_data['comment']
+           Comment.objects.create(user=request.user,listing_id=id,comment=comment)
+           return redirect('entry',name=name,id=id)
+        return redirect('entry',name=name,id=id)
+    return redirect('entry',name=name,id=id)

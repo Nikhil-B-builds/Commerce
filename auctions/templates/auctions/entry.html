@@ -1,7 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
- <h1> Add comments on the listing page </h1>
+     
     {% if not data.sold.status  and  request.user == data.highest_bidder %}
        <div class="alert alert-success" role="alert">
        Congratulations! you won this bid 
@@ -28,9 +28,7 @@
                   <input type="submit" value="Close bid" class="btn btn-warning">
                </form>
                 {% endif %}
-            </div>
-            
-               
+            </div>   
         </div>
         
         <div class="entry-image">
@@ -54,9 +52,9 @@
             {% if not data.sold.status %}
               <h5> Sold to : {{data.highest_bidder}}</h5>
             {% else %}
-            <h5>{{Bid}} Bids so far
+            <h5>{{Bid}} Bids so far 
                 {% if not highest %}
-                   
+                   , Start Fresh now !!!
                 {% elif user == highest.user %}
                     ,You have the highest bid 
                 {% else %}
@@ -72,7 +70,7 @@
             {%csrf_token%}
             <div class="mb-3">
                 <label for="Name" class="form-label">{{form.label}}</label>
-                {{form}}
+                {{bidform}}
             
                 <input class="btn btn-primary" type="submit" value="Place">
                 </div>
@@ -92,11 +90,39 @@
 
                 </li>
             </ul>
-
         </div>
+
+        
+        <div class="comment">
+            <h4>
+                Comments 
+            </h4>
+            {% if comments %}
+            <ul>
+               {% for comment in comments %}
+                    <li> <b>{{comment.user}}</b> : {{comment}} </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+               <li>No comments</li>
+            {% endif %}
+            {% if data.sold.status %}
+            <div class="form" >
+                 <form action="{% url 'comment' name id%}" method="post">
+                {% csrf_token %}
+                <div>
+                    {{comform}}
+                </div>
+                <input type="submit" value="Add" class="btn btn-primary">
+            </form>
+            </div>
+            {% endif %}
+        </div>
+
     </div>
     
-
+    
+    
     
 
 {% endblock %}
