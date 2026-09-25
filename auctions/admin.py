@@ -3,7 +3,7 @@ from auctions.models import *
 # Register your models here.
 
 class AdminListing(admin.ModelAdmin):
-    list_display = ("id","name","price","created_on","image","category")
+    list_display = ("id","name","highest_bidder","price","created_on","image","category")
     
 
 class Userlisting(admin.ModelAdmin):
@@ -19,7 +19,7 @@ class Soldadmin(admin.ModelAdmin):
     list_display= ( 'id','sold_to_id','sold_at','listing_id','status')
 
 admin.site.register(Sold,Soldadmin)
-admin.site.register(Listings,AdminListing)
+admin.site.register(Listing,AdminListing)
 admin.site.register(User,Userlisting)
 admin.site.register(Createdby,createdlisting)
 admin.site.register(Bid,bidlisitng)

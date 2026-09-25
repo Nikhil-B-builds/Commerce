@@ -6,7 +6,7 @@ class User(AbstractUser):
 
 
 
-class Listings(models.Model):
+class Listing(models.Model):
     name = models.CharField(max_length=60,unique=True)
     price = models.IntegerField()
     image = models.URLField(max_length=300,default='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQloBQfR1oxndVS2Z3qfCtzcpFea_-55X9idaGUSIpAQ&s=10')
@@ -20,6 +20,7 @@ class Listings(models.Model):
         ('books', 'Books'),
         ('fashion', 'Fashion'),]
     )
+    highest_bidder = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,related_name='highest')
     
     def __str__(self):
         return f'{self.name}'
@@ -29,14 +30,14 @@ class Listings(models.Model):
 class Bid(models.Model):
 
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='bid')
-    listing = models.ForeignKey(Listings,on_delete=models.CASCADE,related_name='bid')
+    listing = models.ForeignKey(Listing,on_delete=models.CASCADE,related_name='bid')
     amount = models.IntegerField()
     def __str__(self):
         return f'{self.amount}'
 
 
 class Createdby(models.Model):
-     listing = models.OneToOneField(Listings,on_delete=models.CASCADE,related_name="created_by",unique=True)
+     listing = models.OneToOneField(Listing,on_delete=models.CASCADE,related_name="created_by",unique=True)
      name = models.ForeignKey(User,on_delete=models.CASCADE,related_name='created')
 
      def __str__(self):
@@ -44,10 +45,10 @@ class Createdby(models.Model):
 
 
 class Sold(models.Model):
-    listing = models.OneToOneField(Listings,on_delete=models.CASCADE,related_name='sold')
+    listing = models.OneToOneField(Listing,on_delete=models.CASCADE,related_name='sold')
     status =  models.BooleanField(default=True)
     sold_at = models.DateTimeField(auto_now=True)
-    sold_to = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True )
-
+    sold_to = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True,related_name='sold' )
+ 
     def __str__(self):
         return f'{self.sold_to}'

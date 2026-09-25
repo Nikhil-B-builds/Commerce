@@ -41,7 +41,12 @@
                         {% csrf_token %}
                         <input type="submit" class="btn btn-primary" value="Know more">
                     </form>
-                    <p class="date"> Created on : {{listing.created_on}}</p>
+                        {% if not listing.sold.status %}
+                          <p class="date"> Sold on : {{listing.sold.sold_at}}</p>
+                        {% else %}
+                        <p class="date"> Created on : {{listing.created_on}}</p>
+                        {% endif %}
+                    
                 </div>
 
             </td>
