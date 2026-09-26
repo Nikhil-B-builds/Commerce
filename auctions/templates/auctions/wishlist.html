@@ -1,0 +1,28 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+  
+  
+  {% if wishlist %}
+  <table class="table">
+         {% for item in wishlist %}
+        
+           <th>
+            {{item}}
+           </th>
+
+
+           {% endfor %}
+  </table>
+    
+
+
+  {% else %}
+     <h1> No items in wishlist 
+        <b>
+        <a href="{% url 'index' %}">Add one </a>
+       </b>
+    </h1>
+  {% endif %}
+
+{% endblock %}

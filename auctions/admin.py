@@ -20,10 +20,15 @@ class Soldadmin(admin.ModelAdmin):
 
 class Commentadmin(admin.ModelAdmin):
     list_display = ('id',"comment",'listing_id','user_id',)
-    
+
+class Wishlistadmin(admin.ModelAdmin):
+    list_display = ('id','user_id','listing_id')
+
+
 admin.site.register(Sold,Soldadmin)
 admin.site.register(Listing,AdminListing)
 admin.site.register(User,Userlisting)
 admin.site.register(Createdby,createdlisting)
 admin.site.register(Bid,bidlisitng)
 admin.site.register(Comment,Commentadmin)
+admin.site.register(Wishlist,Wishlistadmin)

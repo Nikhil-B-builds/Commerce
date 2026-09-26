@@ -106,7 +106,7 @@
             {% else %}
                <li>No comments</li>
             {% endif %}
-            {% if data.sold.status %}
+            {% if data.sold.status and request.user.is_authenticated %}
             <div class="form" >
                  <form action="{% url 'comment' name id%}" method="post">
                 {% csrf_token %}

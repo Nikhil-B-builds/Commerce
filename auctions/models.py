@@ -29,7 +29,7 @@ class Listing(models.Model):
 
 class Bid(models.Model):
 
-    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='bid')
+    user = models.ForeignKey(User,on_delete=models.SET_NULL,related_name='bid',null=True)
     listing = models.ForeignKey(Listing,on_delete=models.CASCADE,related_name='bid')
     amount = models.IntegerField()
     def __str__(self):
@@ -38,7 +38,7 @@ class Bid(models.Model):
 
 class Createdby(models.Model):
      listing = models.OneToOneField(Listing,on_delete=models.CASCADE,related_name="created_by",unique=True)
-     name = models.ForeignKey(User,on_delete=models.CASCADE,related_name='created')
+     name = models.ForeignKey(User,on_delete=models.SET_NULL,related_name='created',null=True)
 
      def __str__(self):
          return f'{self.name}'
@@ -48,7 +48,7 @@ class Sold(models.Model):
     listing = models.OneToOneField(Listing,on_delete=models.CASCADE,related_name='sold')
     status =  models.BooleanField(default=True)
     sold_at = models.DateTimeField(auto_now=True)
-    sold_to = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True,related_name='sold' )
+    sold_to = models.ForeignKey(User,on_delete=models.SET_NULL,blank=True,null=True,related_name='sold' )
  
     def __str__(self):
         return f'{self.sold_to}'
@@ -61,3 +61,11 @@ class Comment(models.Model):
     
     def __str__(self):
         return f'{self.comment}'
+
+
+class Wishlist(models.Model):
+    listing = models.OneToOneField(Listing,on_delete=models.CASCADE,related_name='wishlist',null=True)
+    user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
+
+    def __str__(self):
+        return f'{self.listing}'

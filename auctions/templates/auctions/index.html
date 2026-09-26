@@ -1,18 +1,16 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-<h1>
-    Wishlist
-</h1>
 <div id="Active_Listings">
     <h2>Active Listings </h2>
 </div>
     
 
 {% if listings %}
-{% for listing in listings %}  
 
-    <table class="Listings">
+    {% for listing in listings %}  
+
+    <table class="Listing">
         <thead>
             <tr>
                 <th ></th>

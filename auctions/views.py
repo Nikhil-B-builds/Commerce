@@ -239,13 +239,8 @@ def add(request):
 
 
 def ren(request,name,data,total_bids,highest,req,id):
-    warn=''
-    if req == 'Higher value':
-       warn = 'Bid value should be higher then current price'
-    elif req == 'not_login':
-       warn = 'You must first login to Bid'
-    else :
-       warn = False
+    warn= req or False
+    
 
     return render(request,'auctions/entry.html',
                                     {
@@ -278,8 +273,8 @@ def bid(request,name,data,total_bids,highest,id):
             return redirect('entry',name=name,id=id)
                  
         return redirect('entry',name=name,id=id)
-             
-    return ren(request,name,data,total_bids,highest,'not_login',id)
+    messages.warning(request, "You need to log in to bid.")
+    return redirect('login')
 
 def entry(request,name,id):
     data = Listing.objects.get(id=id)
@@ -301,11 +296,26 @@ def close(request,name,id):
     return redirect('entry',name=name,id=id)
 
 def comment(request,name,id):
-    if request.method == 'POST':
-        form = Commentform(request.POST)
-        if form.is_valid():
-           comment = form.cleaned_data['comment']
-           Comment.objects.create(user=request.user,listing_id=id,comment=comment)
-           return redirect('entry',name=name,id=id)
+    if request.user.is_authenticated:
+
+        if request.method == 'POST':
+            form = Commentform(request.POST)
+            if form.is_valid():
+                comment = form.cleaned_data['comment']
+                Comment.objects.create(user=request.user,listing_id=id,comment=comment)
+                return redirect('entry',name=name,id=id)
+            return redirect('entry',name=name,id=id)
         return redirect('entry',name=name,id=id)
-    return redirect('entry',name=name,id=id)
+    messages.warning(request, "You need to log in to comment.")
+    return redirect('login')
+
+
+def wishlist(request,name):
+    if request.user.is_authenticated:
+        return render(request,'auctions/wishlist.html',{
+            'wishlist':Wishlist.objects.filter(user=request.user)
+        }
+    )
+    
+    messages.warning(request, "You need to log in to see your wishlist.")
+    return redirect('login')

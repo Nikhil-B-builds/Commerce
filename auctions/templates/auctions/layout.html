@@ -26,7 +26,11 @@
             </li>
             
             <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                    <a class="nav-link" href="{% url 'logout'  %}">Log Out</a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{% url 'wishlist' request.user.username %}" class="nav-link">Wishlist</a>
             </li>
         {% else %}
                 <li class="nav-item">
