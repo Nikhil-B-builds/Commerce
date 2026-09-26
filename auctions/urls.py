@@ -11,5 +11,10 @@ urlpatterns = [
     path("<str:name>-<int:id>",views.entry,name="entry"),
     path('<str:name>-<int:id>/close',views.close,name='close'),
     path('<str:name>-<int:id>/comment',views.comment,name='comment'),
-    path('<str:name>/wishlist',views.wishlist,name='wishlist')
+
+    path('<str:name>-<int:id>/wishlist/add',views.wishlist_add,name='wishlist_add'),
+    path('<str:name>-<int:id>/wishlist/del',views.wishlist_del,name='wishlist_del'),
+    path('<str:name>/wishlist',views.wishlist,name='wishlist'),
+
+    path('category',views.category,name='category')
 ]

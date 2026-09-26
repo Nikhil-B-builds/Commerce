@@ -65,7 +65,7 @@ class Comment(models.Model):
 
 class Wishlist(models.Model):
     listing = models.OneToOneField(Listing,on_delete=models.CASCADE,related_name='wishlist',null=True)
-    user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
+    user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,related_name='wishlist')
 
     def __str__(self):
         return f'{self.listing}'

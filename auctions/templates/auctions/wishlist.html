@@ -1,28 +1,24 @@
-{% extends "auctions/layout.html" %}
-
-{% block body %}
-  
-  
-  {% if wishlist %}
-  <table class="table">
-         {% for item in wishlist %}
-        
-           <th>
-            {{item}}
-           </th>
 
 
-           {% endfor %}
-  </table>
-    
+{% extends 'auctions/grid_template.html' %}
+
+          {% block name %}
+          <a href="{% url 'entry' item.listing.name item.listing.id %}">
+          {% endblock %}
 
 
-  {% else %}
-     <h1> No items in wishlist 
-        <b>
-        <a href="{% url 'index' %}">Add one </a>
-       </b>
-    </h1>
-  {% endif %}
 
-{% endblock %}
+ 
+          {% block img %}
+          <a href="{% url 'entry' item.listing.name item.listing.id %}">
+
+            <img id='wishlist-img' src="{{item.listing.image}}" class="rounded mx-auto d-block" alt="">
+          </a>
+          {% endblock %}
+
+
+ 
+
+
+
+

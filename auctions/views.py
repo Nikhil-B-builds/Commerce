@@ -256,6 +256,7 @@ def ren(request,name,data,total_bids,highest,req,id):
                                     'listing':Listing,
                                     'comments':Comment.objects.filter(listing_id=id),
                                     'comform':Commentform,
+                                    'wishlist':Wishlist.objects.filter(listing_id=id,user=request.user) 
                                 })
 
 
@@ -311,11 +312,77 @@ def comment(request,name,id):
 
 
 def wishlist(request,name):
-    if request.user.is_authenticated:
+   if request.user.is_authenticated:
         return render(request,'auctions/wishlist.html',{
-            'wishlist':Wishlist.objects.filter(user=request.user)
-        }
-    )
+                        'data':Wishlist.objects.filter(user=request.user)
+                    }
+        )
+   messages.warning(request, "You need to log in to see your wishlist.")
+   return redirect('login')
+
+def wishlist_add(request,name,id):
     
-    messages.warning(request, "You need to log in to see your wishlist.")
+    if request.user.is_authenticated:
+            Add_in = lambda request,id: Wishlist.objects.create(user=request.user,listing_id=id)
+            back = lambda id : redirect('entry',name=Listing.objects.get(id=id).name,id=id)
+                
+            if request.method == 'POST':
+                Add_in(request,id)
+            
+            if Wishlist.objects.filter(listing_id=id,user=request.user) and request.method != 'POST':
+               Add_in(request,id)
+               
+            return back(id)
+
+        
+        
+    messages.warning(request, "You need to log in to add items in your wishlist.")
     return redirect('login')
+
+
+def wishlist_del(request,name,id):
+    if request.user.is_authenticated:
+                delete = lambda request,id: Wishlist.objects.get(user=request.user,listing_id=id).delete()
+                back = lambda id : redirect('entry',name=Listing.objects.get(id=id).name,id=id)
+                    
+                if request.method == 'POST':
+                    delete(request,id)
+                
+                if Wishlist.objects.filter(listing_id=id,user=request.user) and request.method != 'POST':
+                   delete(request,id)
+                   
+                return back(id)
+    messages.warning(request, "You need to log in to remove items from your wishlist.")
+    return redirect('login')
+
+
+
+
+
+class categoryform(forms.Form):
+    category = forms.ChoiceField(
+        choices=[
+            
+            ('electronics', 'Electronics'),
+            ('books', 'Books'),
+            ('fashion', 'Fashion'),
+            ('home', 'Home & Garden'),
+        ],
+        initial='electronics',
+        widget=forms.Select(attrs={
+            'class':"form-select form-select-lg mb-3",
+            
+        })
+    
+    )
+
+
+
+def category(request):
+    if request.method == 'POST':
+        ...
+    return render(request,'auctions/categories.html',{
+        'data': None,
+        'form':categoryform(),
+        'show':False
+    })

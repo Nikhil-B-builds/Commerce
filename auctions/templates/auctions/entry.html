@@ -16,11 +16,28 @@
     {%endif%}
     <div>
         <div class="entry-title">
-            <h2>Listing: {{data.name}}  
-             {% if not data.sold.status %}
-                 ( sold )
-            {% endif %}
-            </h2>
+                
+                {% if not data.sold.status %}
+                   <h2>Listing: {{data.name}} ( sold ) </h2>
+                {% else  %}
+                    {% if wishlist  %}
+                     <form action="{% url 'wishlist_del' request.user.username id %}" method="post">
+                            {% csrf_token %}
+                            <h2>Listing: {{data.name}} <input type="submit" value=" &#11088;" class="wishstart" style="background-color: transparent; border: 0;"></h2>
+                    </form>
+                       
+                    {% else %}
+                        
+                        <form action="{% url 'wishlist_add' request.user.username id %}" method="post">
+                            {% csrf_token %}
+                             <h2>Listing: {{data.name}} <input type="submit" value="&star;" class="wishstart" style="background-color: transparent; border: 0;"></h2>
+                        </form>
+                    
+                
+                    {% endif %}
+                {% endif %}
+                
+                
             <div class="form">
                 {% if  request.user.username == created_by.name.username and data.sold.status  %}
                <form action="{% url 'close' name id %}" method="post" > 

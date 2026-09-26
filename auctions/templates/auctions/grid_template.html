@@ -1,0 +1,54 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+
+    {% if data %}
+     <div class="container">
+        {% for item in data %}
+            <div class="item">
+                <div class="name"> 
+                {% block name %}
+                
+                {% endblock %}
+                <h1>{{item}}</h1>
+                <hr>
+                </div>
+
+                <div class="image">
+                {% block img %}
+                
+                {% endblock %}
+                </div>
+
+                <div class="data">
+                    <h5>Current price: {{item.listing.price}} </h5>
+                    <h5>leading bidder: 
+                    {% if item.listing.highest_bidder == request.user %} 
+                        you 
+                    {% else %}
+                        {{item.listing.highest_bidder}}
+                    {% endif  %}
+                    </h5>
+            </div>
+
+            <div class="form">
+                <form action="{% url 'entry' item.listing.name item.listing.id %}">
+                   <input type="submit" value="Know more" class="btn btn-outline-info">
+                </form>
+            </div>
+
+            </div>
+        {% endfor %}
+     </div>
+
+    {% else %}
+            <h1> No items in {% block noitems %} {%endblock%}
+                <b>
+                <a href="{% url 'index' %}">Add one </a>
+            </b>
+            </h1>
+    {% endif %}
+
+
+{% endblock %}
