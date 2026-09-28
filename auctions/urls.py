@@ -16,5 +16,6 @@ urlpatterns = [
     path('<str:name>-<int:id>/wishlist/del',views.wishlist_del,name='wishlist_del'),
     path('<str:name>/wishlist',views.wishlist,name='wishlist'),
 
-    path('category',views.category,name='category')
+    path('category',views.get_category,name='get_category'),
+    path('category/<str:cat>',views.category,name='category')
 ]

@@ -1,0 +1,10 @@
+{% extends "auctions/Card.html" %}
+{% block additional_data %}
+        for this category
+        <br>
+       <a href="{% url 'add' %}">Add one </a>
+       <br>
+       <a href="{% url 'get_category' %}">Search again</a>
+       <br>
+       <a href="{% url 'index' %}">Explore all Listings</a>
+{% endblock %}

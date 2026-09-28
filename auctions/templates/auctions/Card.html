@@ -1,39 +1,40 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-
-
-    {% if data %}
-     <div class="container">
+   
+    {% if data  %}
+   
+    <div class="container">
         {% for item in data %}
             <div class="item">
                 <div class="name"> 
-                {% block name %}
                 
-                {% endblock %}
+                <a href="{% url 'entry' item.name item.id %}"></a>
+               
                 <h1>{{item}}</h1>
                 <hr>
                 </div>
 
                 <div class="image">
-                {% block img %}
-                
-                {% endblock %}
+                  <a href="{% url 'entry' item.name item.id %}">
+
+                    <img id='wishlist-img' src="{{item.image}}" class="rounded mx-auto d-block" alt="">
+                 </a>
                 </div>
 
                 <div class="data">
-                    <h5>Current price: {{item.listing.price}} </h5>
+                    <h5>Current price: {{item.price}} </h5>
                     <h5>leading bidder: 
-                    {% if item.listing.highest_bidder == request.user %} 
+                    {% if item.highest_bidder == request.user %} 
                         you 
                     {% else %}
-                        {{item.listing.highest_bidder}}
+                        {{item.highest_bidder}}
                     {% endif  %}
                     </h5>
             </div>
 
             <div class="form">
-                <form action="{% url 'entry' item.listing.name item.listing.id %}">
+                <form action="{% url 'entry' item.name item.id %}">
                    <input type="submit" value="Know more" class="btn btn-outline-info">
                 </form>
             </div>
@@ -42,13 +43,15 @@
         {% endfor %}
      </div>
 
-    {% else %}
-            <h1> No items in {% block noitems %} {%endblock%}
-                <b>
-                <a href="{% url 'index' %}">Add one </a>
-            </b>
+     
+     
+     
+     {% else %}
+            <h1> No items {% block additional_data %}
+                          {% endblock %} 
+                
             </h1>
     {% endif %}
 
-
 {% endblock %}
+

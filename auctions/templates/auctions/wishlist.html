@@ -1,24 +1,8 @@
+{% extends 'auctions/Card.html' %}
 
-
-{% extends 'auctions/grid_template.html' %}
-
-          {% block name %}
-          <a href="{% url 'entry' item.listing.name item.listing.id %}">
-          {% endblock %}
-
-
-
- 
-          {% block img %}
-          <a href="{% url 'entry' item.listing.name item.listing.id %}">
-
-            <img id='wishlist-img' src="{{item.listing.image}}" class="rounded mx-auto d-block" alt="">
-          </a>
-          {% endblock %}
-
-
- 
-
-
-
-
+{% block additional_data %}
+  in your Wishlist 
+  <b>
+    <a href="{% url 'index' %}">Add one </a>
+  </b>
+{% endblock %}

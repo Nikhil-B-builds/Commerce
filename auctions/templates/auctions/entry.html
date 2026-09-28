@@ -20,21 +20,26 @@
                 {% if not data.sold.status %}
                    <h2>Listing: {{data.name}} ( sold ) </h2>
                 {% else  %}
-                    {% if wishlist  %}
-                     <form action="{% url 'wishlist_del' request.user.username id %}" method="post">
-                            {% csrf_token %}
-                            <h2>Listing: {{data.name}} <input type="submit" value=" &#11088;" class="wishstart" style="background-color: transparent; border: 0;"></h2>
-                    </form>
-                       
-                    {% else %}
+                   {% if request.user.is_authenticated %} 
+                            {% if wishlist  %}
+                            <form action="{% url 'wishlist_del' request.user.username id %}" method="post">
+                                    {% csrf_token %}
+                                    <h2>Listing: {{data.name}} <input type="submit" value=" &#11088;" class="wishstart" style="background-color: transparent; border: 0;"></h2>
+                            </form>
+                            
+                            {% else %}
+                                
+                                <form action="{% url 'wishlist_add' request.user.username id %}" method="post">
+                                    {% csrf_token %}
+                                    <h2>Listing: {{data.name}} <input type="submit" value="&star;" class="wishstart" style="background-color: transparent; border: 0;"></h2>
+                                </form>
+                            
                         
-                        <form action="{% url 'wishlist_add' request.user.username id %}" method="post">
-                            {% csrf_token %}
-                             <h2>Listing: {{data.name}} <input type="submit" value="&star;" class="wishstart" style="background-color: transparent; border: 0;"></h2>
-                        </form>
-                    
-                
+                            {% endif %}
+                    {% else %}
+                      <h2>Listing: {{data.name}}</h2>
                     {% endif %}
+
                 {% endif %}
                 
                 

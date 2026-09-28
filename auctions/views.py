@@ -254,9 +254,9 @@ def ren(request,name,data,total_bids,highest,req,id):
                                     'created_by':Createdby.objects.get(listing_id=id),
                                     'category':data.get_category_display(),
                                     'listing':Listing,
-                                    'comments':Comment.objects.filter(listing_id=id),
+                                    'comments':Listing.objects.filter(comment__listing_id=id),
                                     'comform':Commentform,
-                                    'wishlist':Wishlist.objects.filter(listing_id=id,user=request.user) 
+                                    # 'wishlist':Listing.objects.filter(wishlist__user=request.user) 
                                 })
 
 
@@ -313,8 +313,11 @@ def comment(request,name,id):
 
 def wishlist(request,name):
    if request.user.is_authenticated:
+        wish_data = Wishlist.objects.filter(user=request.user)
         return render(request,'auctions/wishlist.html',{
-                        'data':Wishlist.objects.filter(user=request.user)
+                        'data':Listing.objects.filter(
+                            wishlist__user=request.user
+                        )
                     }
         )
    messages.warning(request, "You need to log in to see your wishlist.")
@@ -378,11 +381,23 @@ class categoryform(forms.Form):
 
 
 
-def category(request):
+def get_category(request):
     if request.method == 'POST':
-        ...
-    return render(request,'auctions/categories.html',{
-        'data': None,
+        form = categoryform(request.POST)
+        if form.is_valid():
+              cat = form.cleaned_data['category']
+              return redirect('category',cat=cat)
+        
+    return render(request,'auctions/find_categories.html',{
         'form':categoryform(),
-        'show':False
     })
+
+
+def category(request,cat):
+
+    data = Listing.objects.filter(category__icontains=cat)
+    return render(request,'auctions/category.html',{
+          'data':data
+      }
+      )
+    
