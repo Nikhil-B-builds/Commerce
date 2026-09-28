@@ -37,7 +37,7 @@ class Bid(models.Model):
 
 
 class Createdby(models.Model):
-     listing = models.OneToOneField(Listing,on_delete=models.CASCADE,related_name="created_by")
+     listing = models.ForeignKey(Listing,on_delete=models.CASCADE,related_name="created_by")
      name = models.ForeignKey(User,on_delete=models.SET_NULL,related_name='created',null=True)
 
      def __str__(self):
